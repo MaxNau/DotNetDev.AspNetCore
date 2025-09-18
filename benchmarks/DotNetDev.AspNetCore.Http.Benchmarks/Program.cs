@@ -12,6 +12,8 @@ internal class Program
 	{
 		var config = ManualConfig.CreateMinimumViable();
 
+		config.ArtifactsPath = "benchmarks/results";
+
 		config.AddExporter(JsonExporter.Default);
 		config.AddExporter(CsvExporter.Default);
 		config.AddExporter(MarkdownExporter.Default);
