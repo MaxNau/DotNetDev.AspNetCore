@@ -47,14 +47,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/*/BenchmarkDotNet.Artifacts/results/*.json
+          path: benchmarks/results/*.json
 
       # 7️⃣ Publish GitHub Pages dashboard
       - name: Publish Benchmark Dashboard
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'benchmarkdotnet'
-          output-file-path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/*/BenchmarkDotNet.Artifacts/results/*.json
+          output-file-path: benchmarks/results/*.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           gh-pages-branch: gh-pages
