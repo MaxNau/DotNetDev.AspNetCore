@@ -50,6 +50,7 @@ jobs:
             results_dir="$dir/benchmark-results"
             for report_file in "$results_dir"/*.htm*; do
               if [ -f "$report_file" ]; then
+                # Use relative path from index.html to file
                 REL_PATH="history/$ts/benchmark-results/$(basename "$report_file")"
                 CARD="<div class=\"card\">
                         <div class=\"timestamp\">$ts</div>
@@ -61,30 +62,22 @@ jobs:
               fi
             done
           done
-
-          # Wrap into multiple slides (15 cards per slide)
+      
+          # Wrap 15 cards per slide (3x5 grid)
           FINAL_HTML=""
-          CARDS_PER_SLIDE=15
-          COUNT=0
-          SLIDE=""
-          for CARD in $SLIDES; do
-            SLIDE="$SLIDE$CARD"
-            COUNT=$((COUNT+1))
-            if [ $COUNT -eq $CARDS_PER_SLIDE ]; then
-              FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
-              SLIDE=""
-              COUNT=0
-            fi
-          done
-          # Add remaining cards if < 15
-          if [ -n "$SLIDE" ]; then
+          CARD_COUNT=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
+          i=0
+          while [ $i -lt $CARD_COUNT ]; do
+            SLIDE=$(echo "$SLIDES" | cut -d'<' -f $((i*4+1))-$(($i*4+15*4)) )
             FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
-          fi
-
+            i=$((i+15))
+          done
+      
+          # Inject into template
           TEMPLATE_FILE="src/index.template.html"
           INDEX_FILE="src/index.html"
           awk -v slides="$FINAL_HTML" '{gsub(/<!--SLIDES-->/,slides); print}' "$TEMPLATE_FILE" > "$INDEX_FILE"
-          
+
       # 5️⃣ Commit history + index.html
       - name: Commit historical results
         run: |
