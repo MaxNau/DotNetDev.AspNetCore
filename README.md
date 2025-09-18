@@ -1,2 +1,3 @@
-# DotNetDev.AspNetCore
-A collection of ASP.NET Core libraries, utilities, and extensions to simplify development and provide reusable components.
+# Github Benchmark Pages
+
+This branch is for hosting benchmark results on GitHub Pages.
