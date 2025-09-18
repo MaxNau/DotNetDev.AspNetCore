@@ -1,18 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<title>Benchmark Dashboard</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Owl Carousel CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+	<!-- jQuery & Owl Carousel JS -->
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+	<style>
+		body {
+			margin: 0;
+			font-family: "Inter", sans-serif;
+			background: #0f111a;
+			color: #e0e0e0;
+			padding: 2rem;
+		}
+
+		header {
+			text-align: center;
+			margin-bottom: 1.5rem;
+		}
+
+			header h1 {
+				font-size: 2.5rem;
+				margin-bottom: 0.3rem;
+			}
+
+			header p {
+				color: #94a3b8;
+			}
+
+		.owl-carousel .slide-grid {
+			display: grid;
+			grid-template-rows: repeat(3,1fr);
+			grid-template-columns: repeat(5,1fr);
+			gap: 15px;
+			padding: 10px;
+		}
+
+		.card {
+			background: #1c1f2a;
+			border-radius: 12px;
+			padding: 15px;
+			box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			text-align: center;
+			transition: transform 0.2s, box-shadow 0.2s;
+		}
+
+			.card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 12px 24px rgba(0,0,0,0.7);
+			}
+
+			.card .timestamp {
+				font-size: 0.85rem;
+				color: #94a3b8;
+				margin-bottom: 10px;
+			}
+
+			.card .report-name {
+				font-size: 0.95rem;
+				color: #e0e0e0;
+				margin-bottom: 15px;
+				word-break: break-word;
+			}
+
+			.card a.view-report {
+				color: white;
+				text-decoration: none;
+				background: #3b82f6;
+				padding: 0.5rem 0.8rem;
+				border-radius: 6px;
+				font-weight: 500;
+				font-size: 0.85rem;
+			}
+
+				.card a.view-report:hover {
+					background: #2563eb;
+				}
+
+		.owl-nav button.owl-prev, .owl-nav button.owl-next {
+			background: #1c1f2a !important;
+			color: #e0e0e0 !important;
+			font-size: 2rem !important;
+			padding: 0.5rem 1rem !important;
+			border-radius: 8px !important;
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			z-index: 10;
+		}
+
+		.owl-nav button.owl-prev {
+			left: -2rem !important;
+		}
+
+		.owl-nav button.owl-next {
+			right: -2rem !important;
+		}
+
+		.owl-nav button:hover {
+			background: #3b82f6 !important;
+			color: white !important;
+		}
+	</style>
 </head>
 <body>
-	<h1>Benchmark Dashboard</h1>
-	<h2>Historical benchmark results:</h2>
-	<table border="1">
-		<tr>
-			<th>Timestamp</th>
-			<th>Report</th>
-		</tr>
-		<!--TABLE_ROWS-->
-	</table>
+
+	<header>
+		<h1>Benchmark Dashboard</h1>
+		<p>Historical benchmark results</p>
+	</header>
+
+	<div class="owl-carousel owl-theme" id="benchmark-carousel">
+		<!--SLIDES-->
+	</div>
+
+	<script>$(document).ready(function(){
+  $('#benchmark-carousel').owlCarousel({
+	  loop:true,
+	  margin:15,
+	  nav:true,
+	  autoplay:false,
+	  navText: ["&#8592;","&#8594;"],
+	  responsive:{ 0:{ items:1 }, 600:{ items:1 }, 1000:{ items:1 } }
+  });
+});</script>
+
 </body>
 </html>
