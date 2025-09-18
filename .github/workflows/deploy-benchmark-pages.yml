@@ -24,7 +24,7 @@ jobs:
           ref: gh-benchmark-pages
           persist-credentials: false
 
-      # 2️⃣ Download benchmark artifacts from previous workflow
+      # 2️⃣ Download benchmark artifacts
       - name: Download benchmark artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -33,7 +33,7 @@ jobs:
           name: benchmark-results
           path: benchmarks/results
 
-      # 3️⃣ Copy results into new timestamped history folder
+      # 3️⃣ Save historical results
       - name: Save historical benchmark results
         run: |
           timestamp=$(date -u +"%Y%m%d-%H%M%S")
@@ -41,81 +41,55 @@ jobs:
           cp -r benchmarks/results/* src/history/$timestamp/benchmark-results/
           echo "TIMESTAMP=$timestamp" >> $GITHUB_ENV
 
-      # 4️⃣ Debug: list what we actually have in history
+      # 4️⃣ List history contents
       - name: List history contents
         run: |
           echo "History folder after adding new results:"
           ls -R src/history || true
 
-      # 5️⃣ Generate index.html from carousel template with slides of 15 cards each
+      # 5️⃣ Generate dashboard from template
       - name: Generate dashboard from template
         run: |
-          TEMPLATE_FILE="src/index.template.html"
-          OUTPUT_FILE="src/index.html"
-      
-          cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
-      
-          slides=""
-          index=1
-          slide_open=false
-          cards_per_slide=15
-          card_count=0
-      
-          # Loop over historical folders
+          SLIDES=""
+          INDEX=1
           for dir in src/history/*; do
-              ts=$(basename "$dir")
-      
-              # Loop over each report in the timestamp folder
-              for report_html in "$dir"/benchmark-results/*.html; do
-                  report_name="Report #$index"
-                  report_link="history/$ts/benchmark-results/$(basename "$report_html")"
-      
-                  card="<div class='card'>
-                          <div class='timestamp'>$ts</div>
-                          <div class='report-name'>$report_name</div>
-                          <a href='$report_link' class='view-report'>View Report</a>
-                        </div>"
-      
-                  # Open a new slide if needed
-                  if [ $card_count -eq 0 ]; then
-                      slide="<div class='slide-grid'>"
-                      slide_open=true
-                  fi
-      
-                  slide="$slide$card"
-                  card_count=$((card_count+1))
-                  index=$((index+1))
-      
-                  # Close slide after 15 cards
-                  if [ $card_count -eq $cards_per_slide ]; then
-                      slide="$slide</div>"
-                      slides="$slides$slide"
-                      card_count=0
-                      slide_open=false
-                  fi
-              done
+            ts=$(basename "$dir")
+            results_dir="$dir/benchmark-results"
+            for report_file in "$results_dir"/*.htm*; do
+              if [ -f "$report_file" ]; then
+                TABLE=$(grep -Poz "(?s)<table.*?>.*?</table>" "$report_file" | tr -d '\n')
+                TABLE_ESCAPED=$(echo "$TABLE" | sed 's/`/\\`/g')
+                CARD="<div class=\"card\">
+                        <div class=\"timestamp\">$ts</div>
+                        <div class=\"report-name\">Report #$INDEX</div>
+                        <a href=\"#\" class=\"view-report\" onclick=\"openModal(\`$TABLE_ESCAPED\`)\">View Report</a>
+                      </div>"
+                SLIDES="$SLIDES$CARD"
+                INDEX=$((INDEX+1))
+              fi
+            done
           done
-      
-          # Close any remaining open slide
-          if [ "$slide_open" = true ]; then
-              slide="$slide</div>"
-              slides="$slides$slide"
-          fi
-      
-          # Safe replacement of <!--SLIDES--> placeholder using awk
-          awk -v slides="$slides" '{gsub("<!--SLIDES-->", slides); print}' "$TEMPLATE_FILE" > "$OUTPUT_FILE"
 
-      # 6️⃣ Commit historical results + index.html
+          # Wrap 15 cards per slide (3x5 grid)
+          FINAL_HTML=""
+          total=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
+          for i in $(seq 0 15 $total); do
+            SLIDE=$(echo "$SLIDES" | sed -n "$((i+1)),$((i+15))p")
+            FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
+          done
+
+          sed "s|<!--SLIDES-->|$FINAL_HTML|" src/index.template.html > src/index.html
+
+      # 6️⃣ Commit changes
       - name: Commit historical results
         run: |
           git config user.name "github-action-benchmark"
           git config user.email "github@users.noreply.github.com"
           git add src/history src/index.html
-          git status
           git commit -m "Add benchmark results for ${{ env.TIMESTAMP }}" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:gh-benchmark-pages
 
-      # 7️⃣ Upload src folder as Pages artifact
+      # 7️⃣ Upload Pages artifact
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
