@@ -68,21 +68,19 @@ jobs:
           SLIDE_CONTENT=""
           COUNT=0
           
-          # Iterate over each card
-          while read -r CARD; do
-            # Skip empty lines
-            [ -z "$CARD" ] && continue
+          # Split SLIDES by a unique marker between cards
+          IFS=$'\n'
+          for CARD in $(echo "$SLIDES" | awk 'BEGIN{RS="<div class=\"card\">"; ORS=""} NR>1{print "<div class=\"card\">" $0 "\n"}'); do
             SLIDE_CONTENT="$SLIDE_CONTENT$CARD"
             COUNT=$((COUNT+1))
           
-            # Every 15 cards, wrap into a slide
             if [ $((COUNT % 15)) -eq 0 ]; then
               FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
               SLIDE_CONTENT=""
             fi
-          done < <(echo "$SLIDES" | sed 's#<div class="card">#\n<div class="card">#g')
+          done
           
-          # Wrap remaining cards
+          # Add any remaining cards
           if [ -n "$SLIDE_CONTENT" ]; then
             FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
           fi
