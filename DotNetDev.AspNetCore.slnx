@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/DotNetDev.AspNetCore.Http.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/" />
+</Solution>

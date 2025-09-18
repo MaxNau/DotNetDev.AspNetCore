@@ -1,0 +1,8 @@
+{
+  "solution": {
+    "path": "DotNetDev.AspNetCore.slnx",
+    "projects": [
+      "benchmarks\\DotNetDev.AspNetCore.Http.Benchmarks\\DotNetDev.AspNetCore.Http.Benchmarks.csproj"
+    ]
+  }
+}
