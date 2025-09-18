@@ -1,0 +1,34 @@
+name: Benchmarks
+
+on:
+  workflow_dispatch:   # run manually
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build benchmarks
+        run: dotnet build benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -c Release
+
+      - name: Run benchmarks
+        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --exporters json
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: benchmarks/**/BenchmarkDotNet.Artifacts/results/*.json
