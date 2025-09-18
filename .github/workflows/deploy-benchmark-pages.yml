@@ -66,20 +66,9 @@ jobs:
           # Wrap 15 cards per slide (3 rows x 5 columns)
           FINAL_HTML=""
           CARDS_PER_SLIDE=15
-          CARD_ARRAY=()
-          # Split SLIDES into individual cards
-          while [[ $SLIDES =~ (<div class=\"card\">.*?</div>) ]]; do
-              CARD_ARRAY+=("${BASH_REMATCH[1]}")
-              SLIDES=${SLIDES#*"${BASH_REMATCH[1]}"}
-          done
-          
-          TOTAL_CARDS=${#CARD_ARRAY[@]}
-          i=0
-          while [ $i -lt $TOTAL_CARDS ]; do
-              SLIDE=""
-              for ((j=0; j<$CARDS_PER_SLIDE && i<TOTAL_CARDS; j++, i++)); do
-                  SLIDE="$SLIDE${CARD_ARRAY[$i]}"
-              done
+          CARD_COUNT=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
+          for ((i=0; i<$CARD_COUNT; i+=CARDS_PER_SLIDE)); do
+              SLIDE=$(echo "$SLIDES" | grep -o "<div class=\"card\">.*?</div>" | sed -n "$((i+1)),$((i+CARDS_PER_SLIDE))p" | tr '\n' ' ')
               FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
           done
       
