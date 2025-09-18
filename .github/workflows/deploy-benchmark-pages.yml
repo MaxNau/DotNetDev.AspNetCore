@@ -50,11 +50,16 @@ jobs:
             results_dir="$dir/benchmark-results"
             for report_file in "$results_dir"/*.htm*; do
               if [ -f "$report_file" ]; then
+                # Extract table HTML from report file
+                TABLE=$(grep -Poz "(?s)<table.*?>.*?</table>" "$report_file" | tr -d '\n')
+                TABLE_ESCAPED=$(echo "$TABLE" | sed 's/`/\\`/g')
+
                 CARD="<div class=\"card\">
                         <div class=\"timestamp\">$ts</div>
                         <div class=\"report-name\">Report #$INDEX</div>
-                        <a href=\"#\" class=\"view-report\" onclick=\"openModal('$report_file')\">View Report</a>
+                        <a href=\"#\" class=\"view-report\" onclick=\"openModal(\`$TABLE_ESCAPED\`)\">View Report</a>
                       </div>"
+
                 SLIDES="$SLIDES$CARD"
                 INDEX=$((INDEX+1))
               fi
