@@ -50,18 +50,19 @@ jobs:
             results_dir="$dir/benchmark-results"
             for report_file in "$results_dir"/*.htm*; do
               if [ -f "$report_file" ]; then
-                # Use file path instead of embedding HTML
+                # Use relative path from index.html to file
+                REL_PATH="history/$ts/benchmark-results/$(basename "$report_file")"
                 CARD="<div class=\"card\">
                         <div class=\"timestamp\">$ts</div>
                         <div class=\"report-name\">Report #$INDEX</div>
-                        <a href=\"#\" class=\"view-report\" onclick=\"openModalFromFile('$report_file')\">View Report</a>
+                        <a href=\"#\" class=\"view-report\" onclick=\"openModalFromFile('$REL_PATH')\">View Report</a>
                       </div>"
                 SLIDES="$SLIDES$CARD"
                 INDEX=$((INDEX+1))
               fi
             done
           done
-
+      
           # Wrap 15 cards per slide (3x5 grid)
           FINAL_HTML=""
           CARD_COUNT=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
@@ -71,8 +72,8 @@ jobs:
             FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
             i=$((i+15))
           done
-
-          # Inject slides into template
+      
+          # Inject into template
           TEMPLATE_FILE="src/index.template.html"
           INDEX_FILE="src/index.html"
           awk -v slides="$FINAL_HTML" '{gsub(/<!--SLIDES-->/,slides); print}' "$TEMPLATE_FILE" > "$INDEX_FILE"
