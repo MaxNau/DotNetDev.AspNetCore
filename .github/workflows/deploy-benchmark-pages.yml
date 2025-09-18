@@ -40,25 +40,24 @@ jobs:
           cp -r benchmarks/results/* src/history/$timestamp/benchmark-results/
           echo "TIMESTAMP=$timestamp" >> $GITHUB_ENV
 
-      
       # 4️⃣ Generate index.html from template with Owl Carousel slides
       - name: Generate dashboard from template
         run: |
-          SLIDES=""
+          SLIDES=()
           INDEX=1
           for dir in src/history/*; do
             ts=$(basename "$dir")
             results_dir="$dir/benchmark-results"
             for report_file in "$results_dir"/*.htm*; do
               if [ -f "$report_file" ]; then
-                # Use relative path from index.html to file
-                REL_PATH="history/$ts/benchmark-results/$(basename "$report_file")"
+                # Extract only the <table> from the HTML
+                table=$(grep -oP '(?s)<table.*?</table>' "$report_file" | tr '\n' ' ' | sed 's/`/\\`/g')
                 CARD="<div class=\"card\">
                         <div class=\"timestamp\">$ts</div>
                         <div class=\"report-name\">Report #$INDEX</div>
-                        <a href=\"#\" class=\"view-report\" onclick=\"openModalFromFile('$REL_PATH')\">View Report</a>
+                        <a href=\"#\" class=\"view-report\" onclick=\"openModal(\`$table\`)\">View Report</a>
                       </div>"
-                SLIDES="$SLIDES$CARD"
+                SLIDES+=("$CARD")
                 INDEX=$((INDEX+1))
               fi
             done
@@ -66,15 +65,23 @@ jobs:
 
           # Wrap 15 cards per slide (3x5 grid)
           FINAL_HTML=""
-          CARD_COUNT=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
-          i=0
-          while [ $i -lt $CARD_COUNT ]; do
-            SLIDE=$(echo "$SLIDES" | cut -d'<' -f $((i*4+1))-$(($i*4+15*4)) )
-            FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
-            i=$((i+15))
+          COUNT=0
+          SLIDE_CONTENT=""
+          for CARD in "${SLIDES[@]}"; do
+            SLIDE_CONTENT="$SLIDE_CONTENT$CARD"
+            COUNT=$((COUNT+1))
+            if [ $COUNT -eq 15 ]; then
+              FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
+              COUNT=0
+              SLIDE_CONTENT=""
+            fi
           done
+          # Add remaining cards if any
+          if [ $COUNT -gt 0 ]; then
+            FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
+          fi
 
-          # Inject into template
+          # Inject slides into template
           TEMPLATE_FILE="src/index.template.html"
           INDEX_FILE="src/index.html"
           awk -v slides="$FINAL_HTML" '{gsub(/<!--SLIDES-->/,slides); print}' "$TEMPLATE_FILE" > "$INDEX_FILE"
