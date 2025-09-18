@@ -1,35 +1,57 @@
 name: Benchmarks
 
 on:
-  workflow_dispatch:   # run manually
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   benchmark:
     runs-on: ubuntu-latest
+    concurrency:
+      group: "benchmarks"
+      cancel-in-progress: false
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
           include-prerelease: true
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore
 
       - name: Build benchmarks
         run: dotnet build benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -c Release
 
+      - name: Ensure results folder exists
+        run: mkdir -p benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/BenchmarkDotNet.Artifacts/results
+
       - name: Run benchmarks
-        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --exporters json
+        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --exporters json csv markdown
 
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: benchmarks/**/BenchmarkDotNet.Artifacts/results/*.json
+          path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/BenchmarkDotNet.Artifacts/results/*
+
+      - name: Publish Benchmark Dashboard
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'benchmarkdotnet'
+          output-file-path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/BenchmarkDotNet.Artifacts/results/*.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: dev/benchmarks
