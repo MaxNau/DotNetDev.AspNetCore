@@ -19,38 +19,42 @@ jobs:
       cancel-in-progress: false
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 10
+      # 2️⃣ Setup .NET 10
+      - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
           include-prerelease: true
 
+      # 3️⃣ Restore dependencies
       - name: Restore
         run: dotnet restore
 
+      # 4️⃣ Build benchmarks project
       - name: Build benchmarks
         run: dotnet build benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -c Release
 
-      - name: Ensure results folder exists
-        run: mkdir -p benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/BenchmarkDotNet.Artifacts/results
-
+      # 5️⃣ Run all benchmarks non-interactively
       - name: Run benchmarks
-        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --exporters json csv markdown
+        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --filter "*"
 
+      # 6️⃣ Upload raw benchmark results
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/BenchmarkDotNet.Artifacts/results/*
+          path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/*/BenchmarkDotNet.Artifacts/results/*.json
 
+      # 7️⃣ Publish GitHub Pages dashboard
       - name: Publish Benchmark Dashboard
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'benchmarkdotnet'
-          output-file-path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/BenchmarkDotNet.Artifacts/results/*.json
+          output-file-path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/*/BenchmarkDotNet.Artifacts/results/*.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           gh-pages-branch: gh-pages
