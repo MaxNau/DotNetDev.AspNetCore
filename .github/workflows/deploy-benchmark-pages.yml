@@ -17,15 +17,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout gh-benchmark-pages branch with full history
+      # 1️⃣ Checkout gh-benchmark-pages branch
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: gh-benchmark-pages
           persist-credentials: false
-          fetch-depth: 0   # important to read historical folders
 
-      # 2️⃣ Download latest benchmark artifacts from previous workflow
+      # 2️⃣ Download benchmark artifacts from previous workflow
       - name: Download benchmark artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -34,31 +33,38 @@ jobs:
           name: benchmark-results
           path: benchmarks/results
 
-      # 3️⃣ Save new results into historical folder
+      # 3️⃣ Copy results to historical folder in repo
       - name: Save historical benchmark results
         run: |
           timestamp=$(date -u +"%Y%m%d-%H%M%S")
           mkdir -p src/history/$timestamp
           cp -r benchmarks/results/* src/history/$timestamp/
 
-      # 4️⃣ Generate Pages dashboard reading all historical data
+      # 4️⃣ Generate index.html listing all historical runs
       - name: Generate Pages dashboard
         run: |
           mkdir -p pages
-          echo "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Benchmark Dashboard</title></head><body>" > pages/index.html
+          echo "<!DOCTYPE html>" > pages/index.html
+          echo "<html><head><meta charset='UTF-8'><title>Benchmark Dashboard</title></head><body>" >> pages/index.html
           echo "<h1>Benchmark Dashboard</h1>" >> pages/index.html
-          echo "<h2>Historical benchmark results:</h2><table border='1' cellpadding='4' cellspacing='0'>" >> pages/index.html
-          echo "<tr><th>Timestamp</th><th>Report</th></tr>" >> pages/index.html
+          echo "<h2>Historical benchmark results:</h2>" >> pages/index.html
+          echo "<table border='1'><tr><th>Timestamp</th><th>Report</th></tr>" >> pages/index.html
+
+          # Copy all historical folders into pages/history
+          mkdir -p pages/history
           for dir in src/history/*; do
               ts=$(basename "$dir")
-              html_file="$dir/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
-              if [ -f "$html_file" ]; then
+              mkdir -p "pages/history/$ts"
+              cp -r "$dir"/* "pages/history/$ts/"
+
+              html_file="history/$ts/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
+              if [ -f "pages/$html_file" ]; then
                   echo "<tr><td>$ts</td><td><a href='$html_file'>View Report</a></td></tr>" >> pages/index.html
               fi
           done
           echo "</table></body></html>" >> pages/index.html
 
-      # 5️⃣ Commit new historical results and updated dashboard
+      # 5️⃣ Commit historical results and dashboard back to gh-benchmark-pages
       - name: Commit historical results
         run: |
           git config user.name "github-action-benchmark"
