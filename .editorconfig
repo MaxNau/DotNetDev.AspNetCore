@@ -1,0 +1,16 @@
+# top-most EditorConfig file
+root = true
+
+# All files
+[*]
+end_of_line = lf
+charset = utf-8
+indent_style = tab
+indent_size = tab
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C# files specifically
+[*.cs]
+dotnet_sort_system_directives_first = true
+csharp_new_line_before_open_brace = all

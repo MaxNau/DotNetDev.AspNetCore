@@ -1,0 +1,15 @@
+# Normalize text files to LF
+* text=auto eol=lf
+
+# Force LF for C# and project files
+*.cs text eol=lf
+*.csproj text eol=lf
+*.sln text eol=lf
+
+# Ignore binary files
+*.bin binary
+*.png binary
+*.jpg binary
+*.dll binary
+*.exe binary
+*.nupkg binary
