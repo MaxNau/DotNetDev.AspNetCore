@@ -103,14 +103,43 @@
 		}
 
 		#report-container {
-			background: white;
-			color: black;
+			background: #1c1f2a;
+			color: #e0e0e0;
 			padding: 1rem;
-			border-radius: 10px;
+			border-radius: 12px;
 			max-width: 90%;
 			max-height: 90%;
 			overflow: auto;
 		}
+
+			#report-container table {
+				width: 100%;
+				border-collapse: collapse;
+				color: #e0e0e0;
+			}
+
+			#report-container th, #report-container td {
+				padding: 8px 12px;
+				border: 1px solid #333;
+				text-align: right;
+			}
+
+			#report-container tr:nth-child(even) {
+				background: #2a2d3a;
+			}
+
+			#report-container tr:nth-child(odd) {
+				background: #1f212a;
+			}
+
+			#report-container th {
+				background: #3b3f56;
+				color: #f0f0f0;
+			}
+
+				#report-container td:first-child, #report-container th:first-child {
+					text-align: left;
+				}
 
 		/* Owl nav buttons */
 		.owl-nav button.owl-prev, .owl-nav button.owl-next {
@@ -150,7 +179,7 @@
 		<!--SLIDES-->
 	</div>
 
-	<!-- Modal container -->
+	<!-- Modal -->
 	<div id="report-modal" onclick="closeModal()">
 		<div id="report-container"></div>
 	</div>
@@ -165,6 +194,7 @@
 			document.getElementById('report-container').innerHTML = '';
 		}
 
+		// Initialize Owl Carousel
 		$(document).ready(function () {
 			$('#benchmark-carousel').owlCarousel({
 				loop: true,
