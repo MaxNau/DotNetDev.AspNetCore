@@ -89,7 +89,6 @@
 				}
 
 		/* Modal */
-		/* Modal */
 		#report-modal {
 			display: none;
 			position: fixed;
@@ -183,10 +182,24 @@
 	</div>
 
 	<script>
-		function openModal(htmlTable) {
-			document.getElementById('report-container').innerHTML = htmlTable;
-			document.getElementById('report-modal').style.display = 'flex';
+		// Fetch and display only the table
+		function openModalFromFile(filePath) {
+			fetch(filePath)
+				.then(res => res.text())
+				.then(html => {
+					const tmp = document.createElement('div');
+					tmp.innerHTML = html;
+					const table = tmp.querySelector('table');
+					document.getElementById('report-container').innerHTML = table ? table.outerHTML : 'Table not found';
+					document.getElementById('report-modal').style.display = 'flex';
+				})
+				.catch(err => {
+					document.getElementById('report-container').innerHTML = 'Error loading report';
+					document.getElementById('report-modal').style.display = 'flex';
+					console.error(err);
+				});
 		}
+
 		function closeModal() {
 			document.getElementById('report-modal').style.display = 'none';
 			document.getElementById('report-container').innerHTML = '';
