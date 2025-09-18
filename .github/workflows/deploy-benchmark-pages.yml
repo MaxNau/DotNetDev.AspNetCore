@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository (gh-benchmark-pages branch)
+      # 1️⃣ Checkout repository (gh-pages branch)
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -36,17 +36,20 @@ jobs:
       - name: Prepare Pages content
         run: |
           mkdir -p pages
-          cp -r benchmarks/results/* pages/
-          cp src/index.html pages/   # copy static index file
+          cp src/index.html pages/
+          
+          # Historical folder with timestamp
+          timestamp=$(date -u +"%Y%m%d-%H%M%S")
+          mkdir -p src/history/$timestamp
+          cp -r benchmarks/results/* src/history/$timestamp/
 
-      # 4️⃣ Upload content to Pages
+      # 4️⃣ Upload Pages artifact
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: pages
+          path: src
 
       # 5️⃣ Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
