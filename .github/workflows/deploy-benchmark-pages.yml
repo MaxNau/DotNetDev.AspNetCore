@@ -62,11 +62,14 @@ jobs:
               fi
             done
           done
-      
-          # Wrap 15 cards per slide
+
+          # Split SLIDES into an array of cards
+          IFS=$'\n' read -rd '' -a CARD_ARRAY <<<"$(echo "$SLIDES" | grep '<div class=\"card\">')"
+
+          # Wrap 15 cards per slide (3x5 grid)
           FINAL_HTML=""
-          CARDS_PER_SLIDE=15
           TOTAL_CARDS=${#CARD_ARRAY[@]}
+          CARDS_PER_SLIDE=15
           for ((i=0; i<TOTAL_CARDS; i+=CARDS_PER_SLIDE)); do
               SLIDE=""
               for ((j=i; j<i+CARDS_PER_SLIDE && j<TOTAL_CARDS; j++)); do
@@ -74,12 +77,12 @@ jobs:
               done
               FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
           done
-          
+
           # Inject into template
           TEMPLATE_FILE="src/index.template.html"
           INDEX_FILE="src/index.html"
           awk -v slides="$FINAL_HTML" '{gsub(/<!--SLIDES-->/,slides); print}' "$TEMPLATE_FILE" > "$INDEX_FILE"
-
+          
       # 5️⃣ Commit history + index.html
       - name: Commit historical results
         run: |
