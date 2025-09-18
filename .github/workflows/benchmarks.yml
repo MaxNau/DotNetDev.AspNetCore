@@ -37,35 +37,27 @@ jobs:
 
       # 5️⃣ Run benchmarks non-interactively
       - name: Run benchmarks
-        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --filter "*"
+        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --filter "*" --exporters html,json,csv
 
-      # 6️⃣ Upload benchmark JSON/CSV/HTML artifacts
+      # 6️⃣ Prepare Pages folder (ensure results exist)
+      - name: Prepare Pages folder
+        run: |
+          mkdir -p benchmarks/results
+          cp benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/results/* benchmarks/results/ || echo "No files yet"
+
+      # 7️⃣ Upload benchmark JSON/CSV/HTML artifacts
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: benchmarks/results/*  # includes all JSON, CSV, HTML
+          path: benchmarks/results/*
 
-  deploy-pages:
-    needs: benchmark
-    runs-on: ubuntu-latest
-
-    steps:
-      # 1️⃣ Checkout repository (needed for Pages deployment)
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # 2️⃣ Configure GitHub Pages
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      # 3️⃣ Upload the benchmark results folder (HTML + JSON + CSV)
-      - name: Upload benchmark dashboard
+      # 8️⃣ Publish GitHub Pages dashboard
+      - name: Upload benchmark dashboard to Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: benchmarks/results  # deploy the entire folder
+          path: benchmarks/results
 
-      # 4️⃣ Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
