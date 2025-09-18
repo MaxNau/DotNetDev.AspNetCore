@@ -45,14 +45,36 @@ jobs:
           mkdir -p benchmarks/results
           cp benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/results/* benchmarks/results/ || echo "No files yet"
 
-      # 7️⃣ Upload benchmark JSON/CSV/HTML artifacts
+      # 7️⃣ Generate index.html for GitHub Pages
+      - name: Generate index.html for benchmark dashboard
+        run: |
+          mkdir -p benchmarks/results
+          cat > benchmarks/results/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <title>Benchmark Dashboard</title>
+          </head>
+          <body>
+            <h1>Benchmark Results</h1>
+            <ul>
+          EOF
+
+          for f in benchmarks/results/*.html; do
+            echo "<li><a href=\"$(basename "$f")\">$(basename "$f")</a></li>" >> benchmarks/results/index.html
+          done
+
+          echo "</ul></body></html>" >> benchmarks/results/index.html
+
+      # 8️⃣ Upload benchmark JSON/CSV/HTML artifacts
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
           path: benchmarks/results/*
 
-      # 8️⃣ Publish GitHub Pages dashboard
+      # 9️⃣ Publish GitHub Pages dashboard
       - name: Upload benchmark dashboard to Pages
         uses: actions/upload-pages-artifact@v3
         with:
@@ -61,3 +83,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
