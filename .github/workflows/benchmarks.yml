@@ -46,18 +46,12 @@ jobs:
           name: benchmark-results
           path: benchmarks/results/*.json  # recursive glob ensures all JSON files are uploaded
 
-      # 7️⃣ Copy JSON files to a flat folder for dashboard
-      - name: Prepare JSON for Dashboard
-        run: |
-          mkdir -p benchmarks/all-json
-          cp benchmarks/results/*.json benchmarks/all-json/
-
-      # 8️⃣ Publish GitHub Pages dashboard
+      # 7️⃣ Publish GitHub Pages dashboard
       - name: Publish Benchmark Dashboard
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'benchmarkdotnet'
-          output-file-path: benchmarks/all-json  # folder with all JSON files
+          output-file-path: benchmarks/results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report-full-compressed.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           gh-pages-branch: gh-pages
