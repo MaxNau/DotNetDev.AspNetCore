@@ -17,6 +17,7 @@ internal class Program
 		config.AddExporter(JsonExporter.Default);
 		config.AddExporter(CsvExporter.Default);
 		config.AddExporter(MarkdownExporter.Default);
+		config.AddExporter(HtmlExporter.Default);
 
 		var _ = BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
 						 .RunAll(config, args);
