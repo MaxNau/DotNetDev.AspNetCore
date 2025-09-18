@@ -33,54 +33,33 @@ jobs:
           name: benchmark-results
           path: benchmarks/results
 
-      # 3️⃣ Copy results to historical folder in repo
+      # 3️⃣ Copy results to historical folder
       - name: Save historical benchmark results
         run: |
           timestamp=$(date -u +"%Y%m%d-%H%M%S")
           mkdir -p src/history/$timestamp
           cp -r benchmarks/results/* src/history/$timestamp/
+          echo "TIMESTAMP=$timestamp" >> $GITHUB_ENV
 
-      # 4️⃣ Generate index.html listing all historical runs
-      - name: Generate Pages dashboard
+      # 4️⃣ Generate index.html from template
+      - name: Generate dashboard from template
         run: |
-          mkdir -p pages
-          echo "<!DOCTYPE html>" > pages/index.html
-          echo "<html><head><meta charset='UTF-8'><title>Benchmark Dashboard</title></head><body>" >> pages/index.html
-          echo "<h1>Benchmark Dashboard</h1>" >> pages/index.html
-          echo "<h2>Historical benchmark results:</h2>" >> pages/index.html
-          echo "<table border='1'><tr><th>Timestamp</th><th>Report</th></tr>" >> pages/index.html
-      
-          # Copy all historical folders into pages/history
-          mkdir -p pages/history
+          rows=""
           for dir in src/history/*; do
               ts=$(basename "$dir")
-              mkdir -p "pages/history/$ts"
-              cp -r "$dir"/* "pages/history/$ts/"
-      
               html_file="history/$ts/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
-              if [ -f "pages/$html_file" ]; then
-                  echo "<tr><td>$ts</td><td><a href='$html_file'>View Report</a></td></tr>" >> pages/index.html
+              if [ -f "src/$html_file" ]; then
+                  rows+="<tr><td>$ts</td><td><a href='$html_file'>View Report</a></td></tr>"
               fi
           done
-      
-          echo "</table></body></html>" >> pages/index.html
 
-      # 5️⃣ Commit historical results and dashboard back to gh-benchmark-pages
+          # inject rows into template
+          sed "s|<!--TABLE_ROWS-->|$rows|" src/index.template.html > src/index.html
+
+      # 5️⃣ Commit updated history + index.html back to branch
       - name: Commit historical results
         run: |
           git config user.name "github-action-benchmark"
           git config user.email "github@users.noreply.github.com"
-          git add src/history pages/index.html
-          git commit -m "Add benchmark results for $timestamp" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:gh-benchmark-pages
-
-      # 6️⃣ Upload Pages folder to GitHub Pages
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: pages
-
-      # 7️⃣ Deploy Pages
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          git add src/history src/index.html
+          git commit -m "Add benchmark results for ${{ env.TIMESTAMP }}" || echo "No changes to commit"
