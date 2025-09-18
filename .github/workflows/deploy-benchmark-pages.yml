@@ -47,7 +47,7 @@ jobs:
           echo "History folder after adding new results:"
           ls -R src/history || true
 
-      # 5️⃣ Generate dashboard from carousel template
+      # 5️⃣ Generate index.html from carousel template
       - name: Generate dashboard from template
         run: |
           TEMPLATE_FILE="src/index.template.html"
@@ -80,10 +80,10 @@ jobs:
               slides="$slides$slide"
           done
 
-          # Replace placeholder in template
-          sed -i "s|<!--SLIDES-->|$slides|g" "$OUTPUT_FILE"
+          # Replace <!--SLIDES--> placeholder safely using | as delimiter
+          sed "s|<!--SLIDES-->|$slides|g" "$TEMPLATE_FILE" > "$OUTPUT_FILE"
 
-      # 6️⃣ Commit history + index.html
+      # 6️⃣ Commit historical results + index.html
       - name: Commit historical results
         run: |
           git config user.name "github-action-benchmark"
