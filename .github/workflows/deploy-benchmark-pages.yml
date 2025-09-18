@@ -43,44 +43,39 @@ jobs:
       # 4️⃣ Generate index.html from template with Owl Carousel slides
       - name: Generate dashboard from template
         run: |
-          SLIDES=""
+          SLIDE_SIZE=15
+          FINAL_HTML=""
+          SLIDE_CONTENT=""
           INDEX=1
+          CARD_COUNT=0
+      
           for dir in src/history/*; do
             ts=$(basename "$dir")
             results_dir="$dir/benchmark-results"
             for report_file in "$results_dir"/*.htm*; do
               if [ -f "$report_file" ]; then
-                # Use relative path from index.html to file
                 REL_PATH="history/$ts/benchmark-results/$(basename "$report_file")"
                 CARD="<div class=\"card\">
                         <div class=\"timestamp\">$ts</div>
                         <div class=\"report-name\">Report #$INDEX</div>
                         <a href=\"#\" class=\"view-report\" onclick=\"openModalFromFile('$REL_PATH')\">View Report</a>
                       </div>"
-                SLIDES="$SLIDES$CARD"
+      
+                # Append card to current slide
+                SLIDE_CONTENT="$SLIDE_CONTENT$CARD"
                 INDEX=$((INDEX+1))
+                CARD_COUNT=$((CARD_COUNT+1))
+      
+                # Wrap into slide every SLIDE_SIZE cards
+                if [ $((CARD_COUNT % SLIDE_SIZE)) -eq 0 ]; then
+                  FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
+                  SLIDE_CONTENT=""
+                fi
               fi
             done
           done
       
-          # Wrap 15 cards per slide (3x5 grid)
-          FINAL_HTML=""
-          SLIDE_CONTENT=""
-          COUNT=0
-          
-          # Split SLIDES by a unique marker between cards
-          IFS=$'\n'
-          for CARD in $(echo "$SLIDES" | awk 'BEGIN{RS="<div class=\"card\">"; ORS=""} NR>1{print "<div class=\"card\">" $0 "\n"}'); do
-            SLIDE_CONTENT="$SLIDE_CONTENT$CARD"
-            COUNT=$((COUNT+1))
-          
-            if [ $((COUNT % 15)) -eq 0 ]; then
-              FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
-              SLIDE_CONTENT=""
-            fi
-          done
-          
-          # Add any remaining cards
+          # Wrap any remaining cards in a final slide
           if [ -n "$SLIDE_CONTENT" ]; then
             FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
           fi
