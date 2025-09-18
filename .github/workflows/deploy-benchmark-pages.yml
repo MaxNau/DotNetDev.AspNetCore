@@ -65,13 +65,27 @@ jobs:
       
           # Wrap 15 cards per slide (3x5 grid)
           FINAL_HTML=""
-          CARD_COUNT=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
-          i=0
-          while [ $i -lt $CARD_COUNT ]; do
-            SLIDE=$(echo "$SLIDES" | cut -d'<' -f $((i*4+1))-$(($i*4+15*4)) )
-            FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
-            i=$((i+15))
-          done
+          SLIDE_CONTENT=""
+          COUNT=0
+          
+          # Iterate over each card
+          while read -r CARD; do
+            # Skip empty lines
+            [ -z "$CARD" ] && continue
+            SLIDE_CONTENT="$SLIDE_CONTENT$CARD"
+            COUNT=$((COUNT+1))
+          
+            # Every 15 cards, wrap into a slide
+            if [ $((COUNT % 15)) -eq 0 ]; then
+              FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
+              SLIDE_CONTENT=""
+            fi
+          done < <(echo "$SLIDES" | sed 's#<div class="card">#\n<div class="card">#g')
+          
+          # Wrap remaining cards
+          if [ -n "$SLIDE_CONTENT" ]; then
+            FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE_CONTENT</div>"
+          fi
       
           # Inject into template
           TEMPLATE_FILE="src/index.template.html"
