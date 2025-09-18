@@ -1,7 +1,7 @@
 name: Benchmarks
 
 on:
-  workflow_dispatch:   # run manually
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
@@ -26,10 +26,20 @@ jobs:
         run: dotnet build benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -c Release
 
       - name: Run benchmarks
-        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --exporters json
+        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --exporters json csv markdown
 
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: benchmarks/**/BenchmarkDotNet.Artifacts/results/*.json
+          path: benchmarks/**/BenchmarkDotNet.Artifacts/results/*.*
+
+      - name: Publish Benchmark Dashboard
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'benchmarkdotnet'
+          output-file-path: benchmarks/**/BenchmarkDotNet.Artifacts/results/*.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: dev/benchmarks
