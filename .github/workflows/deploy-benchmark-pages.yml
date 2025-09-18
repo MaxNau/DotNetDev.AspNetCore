@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository (gh-pages branch)
+      # 1️⃣ Checkout repository (gh-benchmark-pages branch)
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -30,7 +30,6 @@ jobs:
         with:
           workflow: ${{ github.event.workflow_run.workflow_id }}
           workflow_conclusion: success
-          name: benchmark-results
           path: benchmarks/results
 
       # 3️⃣ Prepare Pages content
@@ -38,6 +37,7 @@ jobs:
         run: |
           mkdir -p pages
           cp -r benchmarks/results/* pages/
+          cp gh-benchmark-pages/src/index.html pages/   # copy static index file
 
       # 4️⃣ Upload content to Pages
       - name: Upload Pages artifact
@@ -49,3 +49,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
