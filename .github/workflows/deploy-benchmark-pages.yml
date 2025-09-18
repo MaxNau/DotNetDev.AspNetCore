@@ -47,7 +47,7 @@ jobs:
           echo "History folder after adding new results:"
           ls -R src/history || true
 
-      # 5️⃣ Generate index.html from carousel template
+      # 5️⃣ Generate index.html from carousel template with slides of 15 cards each
       - name: Generate dashboard from template
         run: |
           TEMPLATE_FILE="src/index.template.html"
@@ -57,11 +57,13 @@ jobs:
       
           slides=""
           index=1
+          slide_open=false
+          cards_per_slide=15
+          card_count=0
       
           # Loop over historical folders
           for dir in src/history/*; do
               ts=$(basename "$dir")
-              slide="<div class='slide-grid'>"
       
               # Loop over each report in the timestamp folder
               for report_html in "$dir"/benchmark-results/*.html; do
@@ -74,13 +76,31 @@ jobs:
                           <a href='$report_link' class='view-report'>View Report</a>
                         </div>"
       
-                  slide="$slide$card"
-                  index=$((index+1))
-              done
+                  # Open a new slide if needed
+                  if [ $card_count -eq 0 ]; then
+                      slide="<div class='slide-grid'>"
+                      slide_open=true
+                  fi
       
+                  slide="$slide$card"
+                  card_count=$((card_count+1))
+                  index=$((index+1))
+      
+                  # Close slide after 15 cards
+                  if [ $card_count -eq $cards_per_slide ]; then
+                      slide="$slide</div>"
+                      slides="$slides$slide"
+                      card_count=0
+                      slide_open=false
+                  fi
+              done
+          done
+      
+          # Close any remaining open slide
+          if [ "$slide_open" = true ]; then
               slide="$slide</div>"
               slides="$slides$slide"
-          done
+          fi
       
           # Safe replacement of <!--SLIDES--> placeholder using awk
           awk -v slides="$slides" '{gsub("<!--SLIDES-->", slides); print}' "$TEMPLATE_FILE" > "$OUTPUT_FILE"
