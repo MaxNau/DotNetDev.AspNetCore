@@ -62,7 +62,7 @@ jobs:
           git config user.email "github@users.noreply.github.com"
           git add src/history pages/index.html
           git commit -m "Add benchmark results for $timestamp" || echo "No changes to commit"
-          git push origin gh-benchmark-pages
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:gh-benchmark-pages
 
       # 6️⃣ Upload Pages folder to GitHub Pages
       - name: Upload Pages artifact
