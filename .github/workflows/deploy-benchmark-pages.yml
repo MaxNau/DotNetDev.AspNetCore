@@ -30,6 +30,7 @@ jobs:
         with:
           workflow: ${{ github.event.workflow_run.id }}
           workflow_conclusion: success
+          name: benchmark-results
           path: benchmarks/results
 
       # 3️⃣ Copy results to historical folder
