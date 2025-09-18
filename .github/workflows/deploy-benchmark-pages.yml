@@ -35,13 +35,27 @@ jobs:
       # 3️⃣ Prepare Pages content
       - name: Prepare Pages content
         run: |
-          mkdir -p pages
-          cp src/index.html pages/
-          
+          # Fetch historical data from the branch
+          git fetch origin gh-benchmark-pages
+          git checkout gh-benchmark-pages
+      
           # Historical folder with timestamp
           timestamp=$(date -u +"%Y%m%d-%H%M%S")
           mkdir -p src/history/$timestamp
           cp -r benchmarks/results/* src/history/$timestamp/
+      
+          # Commit and push new historical data
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add src/history
+          git commit -m "Add benchmark results for $timestamp" || echo "Nothing to commit"
+          git push origin gh-benchmark-pages
+      
+          # Prepare Pages folder with index.html and all historical data
+          mkdir -p pages
+          cp src/index.html pages/
+          mkdir -p pages/history
+          cp -r src/history/* pages/history/
 
       # 4️⃣ Upload Pages artifact
       - name: Upload Pages artifact
