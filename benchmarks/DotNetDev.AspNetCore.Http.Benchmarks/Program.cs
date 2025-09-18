@@ -17,6 +17,6 @@ internal class Program
 		config.AddExporter(MarkdownExporter.Default);
 
 		var _ = BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
-						 .Run(args, config);
+						 .RunAll(config, args);
 	}
 }
