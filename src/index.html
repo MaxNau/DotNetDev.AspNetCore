@@ -1,78 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 	<meta charset="UTF-8">
 	<title>Benchmark Dashboard</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			margin: 2rem;
-			background: #f9f9f9;
-		}
-
-		h1 {
-			color: #333;
-		}
-
-		ul {
-			list-style: none;
-			padding-left: 0;
-		}
-
-		li {
-			margin: 0.5rem 0;
-		}
-
-		a {
-			text-decoration: none;
-			color: #0066cc;
-		}
-
-			a:hover {
-				text-decoration: underline;
-			}
-
-		.timestamp {
-			font-weight: bold;
-			color: #444;
-		}
-	</style>
 </head>
 <body>
 	<h1>Benchmark Dashboard</h1>
-	<p>Historical benchmark results:</p>
-	<ul id="history-list"></ul>
-
-	<script>// This assumes all historical runs are under src/history/
-	const historyBase = 'history';
-	const historyList = document.getElementById('history-list');
-
-	// Function to fetch the list of folders in history (GitHub Pages doesn't allow real folder listing,
-	// so we generate it manually in the workflow by copying a JSON index or you maintain a static index.json)
-	const runs = [
-	  // Example structure: populate manually or generate with workflow
-	  // { timestamp: '20250918-1615', files: ['Benchmarks-report.html', 'Benchmarks-report.csv'] },
-	  // { timestamp: '20250918-1620', files: ['Benchmarks-report.html', 'Benchmarks-report.csv'] }
-	];
-
-	// Render runs
-	runs.forEach(run => {
-	  const li = document.createElement('li');
-	  const tsSpan = document.createElement('span');
-	  tsSpan.className = 'timestamp';
-	  tsSpan.textContent = run.timestamp + ': ';
-	  li.appendChild(tsSpan);
-
-	  run.files.forEach((file, i) => {
-		const a = document.createElement('a');
-		a.href = `${historyBase}/${run.timestamp}/${file}`;
-		a.textContent = file;
-		li.appendChild(a);
-		if (i < run.files.length - 1) li.appendChild(document.createTextNode(' | '));
-	  });
-
-	  historyList.appendChild(li);
-	});</script>
+	<h2>Historical benchmark results:</h2>
+	<table border="1">
+		<tr>
+			<th>Timestamp</th>
+			<th>Report</th>
+		</tr>
+		<tr><td>20250918-180928</td><td><a href='history/20250918-180928/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html'>View Report</a></td></tr><tr><td>20250918-181240</td><td><a href='history/20250918-181240/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html'>View Report</a></td></tr>
+	</table>
 </body>
 </html>
-
