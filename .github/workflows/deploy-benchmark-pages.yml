@@ -49,19 +49,20 @@ jobs:
           echo "<h1>Benchmark Dashboard</h1>" >> pages/index.html
           echo "<h2>Historical benchmark results:</h2>" >> pages/index.html
           echo "<table border='1'><tr><th>Timestamp</th><th>Report</th></tr>" >> pages/index.html
-
+      
           # Copy all historical folders into pages/history
           mkdir -p pages/history
           for dir in src/history/*; do
               ts=$(basename "$dir")
               mkdir -p "pages/history/$ts"
               cp -r "$dir"/* "pages/history/$ts/"
-
-              html_file="history/$ts/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
+      
+              html_file="history/$ts/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
               if [ -f "pages/$html_file" ]; then
                   echo "<tr><td>$ts</td><td><a href='$html_file'>View Report</a></td></tr>" >> pages/index.html
               fi
           done
+      
           echo "</table></body></html>" >> pages/index.html
 
       # 5️⃣ Commit historical results and dashboard back to gh-benchmark-pages
