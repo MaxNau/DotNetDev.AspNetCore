@@ -76,7 +76,7 @@ jobs:
           # Inject into template
           TEMPLATE_FILE="src/index.template.html"
           INDEX_FILE="src/index.html"
-          awk -v slides="$FINAL_HTML" '{gsub(/<!--SLIDES-->/,slides); print}' "$TEMPLATE_FILE" >
+          awk -v slides="$FINAL_HTML" '{gsub(/<!--SLIDES-->/,slides); print}' "$TEMPLATE_FILE" > "$INDEX_FILE"
           
       # 5️⃣ Commit history + index.html
       - name: Commit historical results
