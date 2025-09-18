@@ -10,7 +10,7 @@ internal class Program
 {
 	static void Main(string[] args)
 	{
-		var config = ManualConfig.CreateEmpty();
+		var config = ManualConfig.CreateMinimumViable();
 
 		config.AddExporter(JsonExporter.Default);
 		config.AddExporter(CsvExporter.Default);
