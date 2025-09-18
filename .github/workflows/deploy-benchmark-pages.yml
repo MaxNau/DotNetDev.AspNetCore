@@ -15,7 +15,6 @@ jobs:
   deploy-pages:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
     steps:
       # 1️⃣ Checkout gh-benchmark-pages branch
       - name: Checkout repository
@@ -24,7 +23,7 @@ jobs:
           ref: gh-benchmark-pages
           persist-credentials: false
 
-      # 2️⃣ Download benchmark artifacts
+      # 2️⃣ Download benchmark artifacts from previous workflow
       - name: Download benchmark artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -33,7 +32,7 @@ jobs:
           name: benchmark-results
           path: benchmarks/results
 
-      # 3️⃣ Save historical results
+      # 3️⃣ Copy results into new timestamped history folder
       - name: Save historical benchmark results
         run: |
           timestamp=$(date -u +"%Y%m%d-%H%M%S")
@@ -41,13 +40,7 @@ jobs:
           cp -r benchmarks/results/* src/history/$timestamp/benchmark-results/
           echo "TIMESTAMP=$timestamp" >> $GITHUB_ENV
 
-      # 4️⃣ List history contents
-      - name: List history contents
-        run: |
-          echo "History folder after adding new results:"
-          ls -R src/history || true
-
-      # 5️⃣ Generate dashboard from template
+      # 4️⃣ Generate index.html from template with Owl Carousel slides
       - name: Generate dashboard from template
         run: |
           SLIDES=""
@@ -57,12 +50,10 @@ jobs:
             results_dir="$dir/benchmark-results"
             for report_file in "$results_dir"/*.htm*; do
               if [ -f "$report_file" ]; then
-                TABLE=$(grep -Poz "(?s)<table.*?>.*?</table>" "$report_file" | tr -d '\n')
-                TABLE_ESCAPED=$(echo "$TABLE" | sed 's/`/\\`/g')
                 CARD="<div class=\"card\">
                         <div class=\"timestamp\">$ts</div>
                         <div class=\"report-name\">Report #$INDEX</div>
-                        <a href=\"#\" class=\"view-report\" onclick=\"openModal(\`$TABLE_ESCAPED\`)\">View Report</a>
+                        <a href=\"#\" class=\"view-report\" onclick=\"openModal('$report_file')\">View Report</a>
                       </div>"
                 SLIDES="$SLIDES$CARD"
                 INDEX=$((INDEX+1))
@@ -72,15 +63,20 @@ jobs:
 
           # Wrap 15 cards per slide (3x5 grid)
           FINAL_HTML=""
-          total=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
-          for i in $(seq 0 15 $total); do
-            SLIDE=$(echo "$SLIDES" | sed -n "$((i+1)),$((i+15))p")
+          CARD_COUNT=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
+          i=0
+          while [ $i -lt $CARD_COUNT ]; do
+            SLIDE=$(echo "$SLIDES" | cut -d'<' -f $((i*4+1))-$(($i*4+15*4)) )
             FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
+            i=$((i+15))
           done
 
-          sed "s|<!--SLIDES-->|$FINAL_HTML|" src/index.template.html > src/index.html
+          # Replace placeholder safely using awk
+          TEMPLATE_FILE="src/index.template.html"
+          INDEX_FILE="src/index.html"
+          awk -v slides="$FINAL_HTML" '{gsub(/<!--SLIDES-->/,slides); print}' "$TEMPLATE_FILE" > "$INDEX_FILE"
 
-      # 6️⃣ Commit changes
+      # 5️⃣ Commit history + index.html
       - name: Commit historical results
         run: |
           git config user.name "github-action-benchmark"
@@ -89,14 +85,13 @@ jobs:
           git commit -m "Add benchmark results for ${{ env.TIMESTAMP }}" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:gh-benchmark-pages
 
-      # 7️⃣ Upload Pages artifact
+      # 6️⃣ Upload src folder as Pages artifact
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: src
 
-      # 8️⃣ Deploy to GitHub Pages
+      # 7️⃣ Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
