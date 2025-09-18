@@ -33,27 +33,32 @@ jobs:
           name: benchmark-results
           path: benchmarks/results
 
-      # 3️⃣ Copy results to historical folder
+      # 3️⃣ Copy results to historical folder in repo
       - name: Save historical benchmark results
         run: |
           timestamp=$(date -u +"%Y%m%d-%H%M%S")
           mkdir -p src/history/$timestamp
           cp -r benchmarks/results/* src/history/$timestamp/
 
-      # 4️⃣ Generate index.html listing all historical runs
+      # 4️⃣ Generate Pages index.html dynamically from repo history
       - name: Generate Pages dashboard
         run: |
           mkdir -p pages
-          echo "<h1>Benchmark Dashboard</h1>" > pages/index.html
-          echo "<h2>Historical benchmark results:</h2><ul>" >> pages/index.html
+          echo "<!DOCTYPE html>" > pages/index.html
+          echo "<html><head><meta charset='UTF-8'><title>Benchmark Dashboard</title></head><body>" >> pages/index.html
+          echo "<h1>Benchmark Dashboard</h1>" >> pages/index.html
+          echo "<h2>Historical benchmark results</h2>" >> pages/index.html
+          echo "<table border='1' cellpadding='5'><tr><th>Timestamp</th><th>Report</th></tr>" >> pages/index.html
+
           for dir in src/history/*; do
               ts=$(basename "$dir")
               html_file="$dir/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
               if [ -f "$html_file" ]; then
-                  echo "<li><a href='$html_file'>$ts</a></li>" >> pages/index.html
+                  echo "<tr><td>$ts</td><td><a href='$html_file'>View Report</a></td></tr>" >> pages/index.html
               fi
           done
-          echo "</ul>" >> pages/index.html
+
+          echo "</table></body></html>" >> pages/index.html
 
       # 5️⃣ Commit historical results and dashboard back to gh-benchmark-pages
       - name: Commit historical results
