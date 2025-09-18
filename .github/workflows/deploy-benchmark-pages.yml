@@ -47,19 +47,41 @@ jobs:
           echo "History folder after adding new results:"
           ls -R src/history || true
 
-      # 5️⃣ Generate index.html from template
+      # 5️⃣ Generate dashboard from carousel template
       - name: Generate dashboard from template
         run: |
-          rows=""
+          TEMPLATE_FILE="src/index.template.html"
+          OUTPUT_FILE="src/index.html"
+
+          cp "$TEMPLATE_FILE" "$OUTPUT_FILE"
+
+          slides=""
+
+          # Loop over historical folders
           for dir in src/history/*; do
               ts=$(basename "$dir")
-              html_file="history/$ts/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
-              if [ -f "src/$html_file" ]; then
-                  rows+="<tr><td>$ts</td><td><a href='$html_file'>View Report</a></td></tr>"
-              fi
+              slide="<div class='slide-grid'>"
+
+              # Loop over each report in the timestamp folder
+              for report_html in "$dir"/benchmark-results/*.html; do
+                  report_name="Report #$(basename "$report_html" .html)"
+                  report_link="history/$ts/benchmark-results/$(basename "$report_html")"
+
+                  card="<div class='card'>
+                          <div class='timestamp'>$ts</div>
+                          <div class='report-name'>$report_name</div>
+                          <a href='$report_link' class='view-report'>View Report</a>
+                        </div>"
+
+                  slide="$slide$card"
+              done
+
+              slide="$slide</div>"
+              slides="$slides$slide"
           done
 
-          sed "s|<!--TABLE_ROWS-->|$rows|" src/index.template.html > src/index.html
+          # Replace placeholder in template
+          sed -i "s|<!--SLIDES-->|$slides|g" "$OUTPUT_FILE"
 
       # 6️⃣ Commit history + index.html
       - name: Commit historical results
