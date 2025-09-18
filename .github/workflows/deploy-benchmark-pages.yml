@@ -63,15 +63,18 @@ jobs:
             done
           done
       
-          # Wrap 15 cards per slide (3 rows x 5 columns)
+          # Wrap 15 cards per slide
           FINAL_HTML=""
           CARDS_PER_SLIDE=15
-          CARD_COUNT=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
-          for ((i=0; i<$CARD_COUNT; i+=CARDS_PER_SLIDE)); do
-              SLIDE=$(echo "$SLIDES" | grep -o "<div class=\"card\">.*?</div>" | sed -n "$((i+1)),$((i+CARDS_PER_SLIDE))p" | tr '\n' ' ')
+          TOTAL_CARDS=${#CARD_ARRAY[@]}
+          for ((i=0; i<TOTAL_CARDS; i+=CARDS_PER_SLIDE)); do
+              SLIDE=""
+              for ((j=i; j<i+CARDS_PER_SLIDE && j<TOTAL_CARDS; j++)); do
+                  SLIDE="$SLIDE${CARD_ARRAY[$j]}"
+              done
               FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
           done
-      
+          
           # Inject into template
           TEMPLATE_FILE="src/index.template.html"
           INDEX_FILE="src/index.html"
