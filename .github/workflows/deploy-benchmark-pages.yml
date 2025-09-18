@@ -50,22 +50,19 @@ jobs:
             results_dir="$dir/benchmark-results"
             for report_file in "$results_dir"/*.htm*; do
               if [ -f "$report_file" ]; then
-                # Extract table HTML from report file
-                TABLE=$(grep -Poz "(?s)<table.*?>.*?</table>" "$report_file" | tr -d '\n')
-                TABLE_ESCAPED=$(echo "$TABLE" | sed 's/`/\\`/g')
-
+                # Read HTML content and escape backticks for JS
+                content=$(sed 's/`/\\`/g' "$report_file" | tr '\n' ' ')
                 CARD="<div class=\"card\">
                         <div class=\"timestamp\">$ts</div>
                         <div class=\"report-name\">Report #$INDEX</div>
-                        <a href=\"#\" class=\"view-report\" onclick=\"openModal(\`$TABLE_ESCAPED\`)\">View Report</a>
+                        <a href=\"#\" class=\"view-report\" onclick=\"openModal(\`$content\`)\">View Report</a>
                       </div>"
-
                 SLIDES="$SLIDES$CARD"
                 INDEX=$((INDEX+1))
               fi
             done
           done
-
+      
           # Wrap 15 cards per slide (3x5 grid)
           FINAL_HTML=""
           CARD_COUNT=$(echo "$SLIDES" | grep -o "<div class=\"card\">" | wc -l)
@@ -75,8 +72,8 @@ jobs:
             FINAL_HTML="$FINAL_HTML<div class='slide-grid'>$SLIDE</div>"
             i=$((i+15))
           done
-
-          # Replace placeholder safely using awk
+      
+          # Inject into template
           TEMPLATE_FILE="src/index.template.html"
           INDEX_FILE="src/index.html"
           awk -v slides="$FINAL_HTML" '{gsub(/<!--SLIDES-->/,slides); print}' "$TEMPLATE_FILE" > "$INDEX_FILE"
