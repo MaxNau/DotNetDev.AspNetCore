@@ -1,12 +1,12 @@
-﻿using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Running;
 
-namespace DotNetDev.AspNetCore.Http.Benchmarks
+namespace DotNetDev.AspNetCore.Http.Benchmarks;
+
+internal class Program
 {
-	internal class Program
+	static void Main(string[] args)
 	{
-		static void Main(string[] args)
-		{
-			var _ = BenchmarkRunner.Run(typeof(Program).Assembly);
-		}
+
+		var _ = BenchmarkRunner.Run(typeof(Program).Assembly);
 	}
 }
