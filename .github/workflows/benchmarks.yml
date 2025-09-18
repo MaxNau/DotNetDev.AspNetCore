@@ -7,9 +7,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
   benchmark:
@@ -38,40 +36,3 @@ jobs:
       # 5️⃣ Run benchmarks non-interactively
       - name: Run benchmarks
         run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --filter "*"
-
-      # 6️⃣ Prepare timestamped results folder
-      - name: Prepare Pages folder with timestamp
-        run: |
-          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          RUN_DIR="benchmarks/results/$TIMESTAMP"
-          mkdir -p "$RUN_DIR"
-          cp benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/results/* "$RUN_DIR"/ || echo "No files yet"
-
-      # 7️⃣ Generate historical index.html
-      - name: Generate benchmark history index
-        run: |
-          INDEX_FILE="benchmarks/results/index.html"
-          echo "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Benchmark History</title></head><body><h1>Benchmark History</h1><ul>" > $INDEX_FILE
-          for runfolder in benchmarks/results/*/; do
-            runname=$(basename "$runfolder")
-            # Skip the index file itself
-            [ "$runname" != "index.html" ] && echo "<li><a href=\"$runname/index.html\">$runname</a></li>" >> $INDEX_FILE
-          done
-          echo "</ul></body></html>" >> $INDEX_FILE
-
-      # 8️⃣ Upload benchmark JSON/CSV/HTML artifacts
-      - name: Upload Benchmark Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-results
-          path: benchmarks/results/*
-
-      # 9️⃣ Publish GitHub Pages dashboard
-      - name: Upload benchmark dashboard to Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: benchmarks/results
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
