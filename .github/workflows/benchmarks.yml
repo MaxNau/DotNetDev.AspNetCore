@@ -39,33 +39,25 @@ jobs:
       - name: Run benchmarks
         run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --filter "*"
 
-      # 6️⃣ Prepare Pages folder (ensure results exist)
-      - name: Prepare Pages folder
+      # 6️⃣ Prepare timestamped results folder
+      - name: Prepare Pages folder with timestamp
         run: |
-          mkdir -p benchmarks/results
-          cp benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/results/* benchmarks/results/ || echo "No files yet"
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          RUN_DIR="benchmarks/results/$TIMESTAMP"
+          mkdir -p "$RUN_DIR"
+          cp benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/results/* "$RUN_DIR"/ || echo "No files yet"
 
-      # 7️⃣ Generate index.html for GitHub Pages
-      - name: Generate index.html for benchmark dashboard
+      # 7️⃣ Generate historical index.html
+      - name: Generate benchmark history index
         run: |
-          mkdir -p benchmarks/results
-          cat > benchmarks/results/index.html <<'EOF'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <title>Benchmark Dashboard</title>
-          </head>
-          <body>
-            <h1>Benchmark Results</h1>
-            <ul>
-          EOF
-
-          for f in benchmarks/results/*.html; do
-            echo "<li><a href=\"$(basename "$f")\">$(basename "$f")</a></li>" >> benchmarks/results/index.html
+          INDEX_FILE="benchmarks/results/index.html"
+          echo "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>Benchmark History</title></head><body><h1>Benchmark History</h1><ul>" > $INDEX_FILE
+          for runfolder in benchmarks/results/*/; do
+            runname=$(basename "$runfolder")
+            # Skip the index file itself
+            [ "$runname" != "index.html" ] && echo "<li><a href=\"$runname/index.html\">$runname</a></li>" >> $INDEX_FILE
           done
-
-          echo "</ul></body></html>" >> benchmarks/results/index.html
+          echo "</ul></body></html>" >> $INDEX_FILE
 
       # 8️⃣ Upload benchmark JSON/CSV/HTML artifacts
       - name: Upload Benchmark Results
@@ -83,4 +75,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
