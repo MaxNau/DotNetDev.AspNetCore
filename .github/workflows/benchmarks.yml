@@ -37,7 +37,7 @@ jobs:
 
       # 5️⃣ Run benchmarks non-interactively
       - name: Run benchmarks
-        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --filter "*" --exporters html,json,csv
+        run: dotnet run -c Release --project benchmarks/DotNetDev.AspNetCore.Http.Benchmarks -- --filter "*"
 
       # 6️⃣ Upload benchmark JSON/CSV/HTML artifacts
       - name: Upload Benchmark Results
