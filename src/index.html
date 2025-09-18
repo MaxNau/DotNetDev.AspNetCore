@@ -5,11 +5,8 @@
 	<title>Benchmark Dashboard</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<!-- Owl Carousel CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
-
-	<!-- jQuery & Owl Carousel JS -->
 	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
@@ -96,21 +93,47 @@
 			left: 0;
 			width: 100%;
 			height: 100%;
-			background: rgba(0,0,0,0.9);
+			background: rgba(0,0,0,0.85);
 			z-index: 1000;
 			justify-content: center;
 			align-items: center;
 		}
 
 		#report-container {
-			background: white;
-			color: black;
-			padding: 1rem;
-			border-radius: 10px;
-			max-width: 90%;
+			background: #1c1f2a;
+			border-radius: 12px;
+			box-shadow: 0 12px 24px rgba(0,0,0,0.7);
+			width: 90%;
+			max-width: 1200px;
 			max-height: 90%;
+			padding: 20px;
 			overflow: auto;
 		}
+
+			#report-container table {
+				width: 100%;
+				border-collapse: collapse;
+				color: #e0e0e0;
+			}
+
+			#report-container th, #report-container td {
+				padding: 8px 12px;
+				border: 1px solid #333;
+				text-align: right;
+			}
+
+			#report-container tr:nth-child(even) {
+				background: #2a2d3a;
+			}
+
+			#report-container tr:nth-child(odd) {
+				background: #1f212a;
+			}
+
+			#report-container th {
+				background: #3b3f56;
+				color: #f0f0f0;
+			}
 
 		/* Owl nav buttons */
 		.owl-nav button.owl-prev, .owl-nav button.owl-next {
@@ -179,15 +202,20 @@
               <div class="timestamp">20250918-210133</div>
               <div class="report-name">Report #8</div>
               <a href="#" class="view-report" onclick="openModal('src/history/20250918-210133/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html')">View Report</a>
+            </div><div class="card">
+              <div class="timestamp">20250918-211151</div>
+              <div class="report-name">Report #9</div>
+              <a href="#" class="view-report" onclick="openModal('src/history/20250918-211151/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html')">View Report</a>
             </div></div>
 	</div>
 
-	<!-- Modal container -->
+	<!-- Modal -->
 	<div id="report-modal" onclick="closeModal()">
 		<div id="report-container"></div>
 	</div>
 
 	<script>
+		// Open modal with a table
 		function openModal(htmlTable) {
 			document.getElementById('report-container').innerHTML = htmlTable;
 			document.getElementById('report-modal').style.display = 'flex';
@@ -196,17 +224,6 @@
 			document.getElementById('report-modal').style.display = 'none';
 			document.getElementById('report-container').innerHTML = '';
 		}
-
-		$(document).ready(function () {
-			$('#benchmark-carousel').owlCarousel({
-				loop: true,
-				margin: 15,
-				nav: true,
-				autoplay: false,
-				navText: ["&#8592;", "&#8594;"],
-				responsive: { 0: { items: 1 }, 600: { items: 1 }, 1000: { items: 1 } }
-			});
-		});
 	</script>
 
 </body>
