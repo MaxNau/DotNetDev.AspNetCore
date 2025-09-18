@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p pages
           cp -r benchmarks/results/* pages/
-          cp gh-benchmark-pages/src/index.html pages/   # copy static index file
+          cp src/index.html pages/   # copy static index file
 
       # 4️⃣ Upload content to Pages
       - name: Upload Pages artifact
