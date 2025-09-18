@@ -33,33 +33,51 @@ jobs:
           name: benchmark-results
           path: benchmarks/results
 
-      # 3️⃣ Copy results to historical folder
+      # 3️⃣ Copy results into new timestamped history folder
       - name: Save historical benchmark results
         run: |
           timestamp=$(date -u +"%Y%m%d-%H%M%S")
-          mkdir -p src/history/$timestamp
-          cp -r benchmarks/results/* src/history/$timestamp/
+          mkdir -p src/history/$timestamp/benchmark-results
+          cp -r benchmarks/results/* src/history/$timestamp/benchmark-results/
           echo "TIMESTAMP=$timestamp" >> $GITHUB_ENV
 
-      # 4️⃣ Generate index.html from template
+      # 4️⃣ Debug: list what we actually have in history
+      - name: List history contents
+        run: |
+          echo "History folder after adding new results:"
+          ls -R src/history || true
+
+      # 5️⃣ Generate index.html from template
       - name: Generate dashboard from template
         run: |
           rows=""
           for dir in src/history/*; do
               ts=$(basename "$dir")
-              html_file="history/$ts/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
+              html_file="history/$ts/benchmark-results/DotNetDev.AspNetCore.Http.Benchmarks.Benchmarks-report.html"
               if [ -f "src/$html_file" ]; then
                   rows+="<tr><td>$ts</td><td><a href='$html_file'>View Report</a></td></tr>"
               fi
           done
 
-          # inject rows into template
           sed "s|<!--TABLE_ROWS-->|$rows|" src/index.template.html > src/index.html
 
-      # 5️⃣ Commit updated history + index.html back to branch
+      # 6️⃣ Commit history + index.html
       - name: Commit historical results
         run: |
           git config user.name "github-action-benchmark"
           git config user.email "github@users.noreply.github.com"
           git add src/history src/index.html
+          git status
           git commit -m "Add benchmark results for ${{ env.TIMESTAMP }}" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:gh-benchmark-pages
+
+      # 7️⃣ Upload src folder as Pages artifact
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: src
+
+      # 8️⃣ Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
