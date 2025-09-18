@@ -49,10 +49,13 @@ jobs:
           INDEX=1
           CARD_COUNT=0
       
-          for dir in src/history/*; do
+          # Loop over timestamps newest first
+          for dir in $(ls -1d src/history/* | sort -r); do
             ts=$(basename "$dir")
             results_dir="$dir/benchmark-results"
-            for report_file in "$results_dir"/*.htm*; do
+      
+            # Loop over reports newest first
+            for report_file in $(ls -1 "$results_dir"/*.htm* 2>/dev/null | sort -r); do
               if [ -f "$report_file" ]; then
                 REL_PATH="history/$ts/benchmark-results/$(basename "$report_file")"
                 CARD="<div class=\"card\">
