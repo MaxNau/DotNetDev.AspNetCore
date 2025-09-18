@@ -43,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/results/*
+          path: benchmarks/results/*
