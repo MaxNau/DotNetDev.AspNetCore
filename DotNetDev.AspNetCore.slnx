@@ -3,6 +3,9 @@
     <Project Path="benchmarks/DotNetDev.AspNetCore.Http.Benchmarks/DotNetDev.AspNetCore.Http.Benchmarks.csproj" />
   </Folder>
   <Folder Name="/lab/" />
+  <Folder Name="/lab/apps/">
+    <Project Path="lab/apps/DotNetDev.Lab.Apps.FormUploadBuffering/DotNetDev.Lab.Apps.FormUploadBuffering.csproj" Id="c6851077-81e0-412d-beb0-90b0aa0fbf4a" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />
