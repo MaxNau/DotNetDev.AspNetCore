@@ -7,7 +7,7 @@ namespace DotNetDev.Lab.Apps.FormUploadBuffering.Controllers;
 public class FileUploadController : ControllerBase
 {
 	[HttpPost("upload")]
-	public async Task<IActionResult> UploadFileAsync(IFormFile _)
+	public async Task<IActionResult> UploadFileAsync(IFormFile file)
 	{
 		await Task.CompletedTask;
 

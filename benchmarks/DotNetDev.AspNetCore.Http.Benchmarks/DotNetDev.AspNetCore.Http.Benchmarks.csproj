@@ -6,7 +6,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\lab\harness\assets\DotNetDev.TestAssets\10MB.bin" Link="10MB.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\lab\harness\assets\DotNetDev.TestAssets\25MB.bin" Link="25MB.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\lab\harness\assets\DotNetDev.TestAssets\50MB.bin" Link="50MB.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
     <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="18.0.36313.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\lab\apps\DotNetDev.Lab.Apps.FormUploadBuffering\DotNetDev.Lab.Apps.FormUploadBuffering.csproj" />
+    <ProjectReference Include="..\..\lab\harness\DotNetDev.TestBench.Shared\DotNetDev.TestBench.Shared.csproj" />
   </ItemGroup>
 </Project>

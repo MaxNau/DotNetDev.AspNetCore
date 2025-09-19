@@ -1,25 +1,13 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Exporters.Csv;
-using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Running;
+using DotNetDev.AspNetCore.Http.Benchmarks;
 
-namespace DotNetDev.AspNetCore.Http.Benchmarks;
+var config = ManualConfig.CreateMinimumViable();
 
-internal class Program
-{
-	static void Main(string[] args)
-	{
-		var config = ManualConfig.CreateMinimumViable();
+config.ArtifactsPath = "benchmarks";
 
-		config.ArtifactsPath = "benchmarks";
+config.AddExporter(HtmlExporter.Default);
 
-		config.AddExporter(JsonExporter.Default);
-		config.AddExporter(CsvExporter.Default);
-		config.AddExporter(MarkdownExporter.Default);
-		config.AddExporter(HtmlExporter.Default);
-
-		var _ = BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
-						 .RunAll(config, args);
-	}
-}
+var _ = BenchmarkSwitcher.FromAssembly(typeof(FormFeatureBenchmarks).Assembly)
+				 .RunAll(config, args);

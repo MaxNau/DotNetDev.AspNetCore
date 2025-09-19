@@ -6,6 +6,13 @@
   <Folder Name="/lab/apps/">
     <Project Path="lab/apps/DotNetDev.Lab.Apps.FormUploadBuffering/DotNetDev.Lab.Apps.FormUploadBuffering.csproj" Id="c6851077-81e0-412d-beb0-90b0aa0fbf4a" />
   </Folder>
+  <Folder Name="/lab/experiments/" />
+  <Folder Name="/lab/harness/">
+    <Project Path="lab/harness/DotNetDev.TestBench.Shared/DotNetDev.TestBench.Shared.csproj" Id="edcabee8-e7e1-424d-a451-c3f1f594821a" />
+  </Folder>
+  <Folder Name="/lab/harness/assets/">
+    <Project Path="lab/harness/assets/DotNetDev.TestAssets/DotNetDev.TestAssets.shproj" Id="45799e5c-e76c-42dd-bdc2-3b43bf748bb3" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />
