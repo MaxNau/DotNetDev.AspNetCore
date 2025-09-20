@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>DotNetDev.AspNetCore.Http.Benchmarks.FormFeatureBenchmarks-20250920-084208</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.2, Linux Ubuntu 24.04.3 LTS (Noble Numbat)
+AMD EPYC 7763, 1 CPU, 4 logical and 2 physical cores
+.NET SDK 10.0.100-rc.1.25451.107
+  [Host]   : .NET 10.0.0 (10.0.25.45207), X64 RyuJIT AVX2
+  ShortRun : .NET 10.0.0 (10.0.25.45207), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>Job=ShortRun  InvocationCount=1  IterationCount=3  
+LaunchCount=1  UnrollFactor=1  WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method                                                   </th><th>FileName</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>Microsoft_AspNetCore_Http_Features_FormFeature_Using_TestServer</td><td>10MB.bin</td><td>29.83 ms</td><td>43.60 ms</td><td>2.390 ms</td><td>1.00</td><td>0.10</td><td>257.78 KB</td><td>1.00</td>
+</tr><tr><td>Microsoft_AspNetCore_Http_Features_FormFeature_Using_TestServer</td><td>25MB.bin</td><td>77.27 ms</td><td>93.30 ms</td><td>5.114 ms</td><td>1.00</td><td>0.08</td><td>575.45 KB</td><td>1.00</td>
+</tr><tr><td>Microsoft_AspNetCore_Http_Features_FormFeature_Using_TestServer</td><td>50MB.bin</td><td>142.27 ms</td><td>191.72 ms</td><td>10.509 ms</td><td>1.00</td><td>0.09</td><td>1100.48 KB</td><td>1.00</td>
+</tr></tbody></table>
+</body>
+</html>
