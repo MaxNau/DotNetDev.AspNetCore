@@ -23,4 +23,7 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/DotNetDev.AspNetCore.Http.Tests/DotNetDev.AspNetCore.Http.Tests.csproj" Id="0c097de3-02da-42ff-921d-6909d1ea4f35" />
+  </Folder>
 </Solution>
