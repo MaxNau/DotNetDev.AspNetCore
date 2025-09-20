@@ -6,7 +6,9 @@
   <Folder Name="/lab/apps/">
     <Project Path="lab/apps/DotNetDev.Lab.Apps.FormUploadBuffering/DotNetDev.Lab.Apps.FormUploadBuffering.csproj" Id="c6851077-81e0-412d-beb0-90b0aa0fbf4a" />
   </Folder>
-  <Folder Name="/lab/experiments/" />
+  <Folder Name="/lab/experiments/">
+    <Project Path="lab/experiments/DotNetDev.AspNetCore.Http/DotNetDev.AspNetCore.Http.csproj" Id="46b175c4-34bd-4507-8d5e-05e039fbc851" />
+  </Folder>
   <Folder Name="/lab/harness/">
     <Project Path="lab/harness/DotNetDev.TestBench.Shared/DotNetDev.TestBench.Shared.csproj" Id="edcabee8-e7e1-424d-a451-c3f1f594821a" />
   </Folder>
